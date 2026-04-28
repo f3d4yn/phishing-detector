@@ -1,0 +1,26 @@
+# Environnement virtuel
+venv/
+
+# Modèles entraînés (trop lourds pour GitHub)
+models/model.pkl
+models/vectorizer.pkl
+
+# Logs
+logs/
+
+# Fichiers Python compilés
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Fichiers système
+.DS_Store
+*.egg-info/
+dist/
+build/
+data/email_dataset.csv
+data/phishing_dataset.csv
