@@ -1,26 +1,30 @@
-# Environnement virtuel
+# Environnement virtuels
 venv/
+myproject-env/
 
-# Modèles entraînés (trop lourds pour GitHub)
-models/model.pkl
-models/vectorizer.pkl
+# Modèles (gérés par Git LFS)
+# models/ -> inclus via LFS
+
+# Datasets
+data/email_dataset.csv
+data/phishing_dataset.csv
+
+# Build PyPI
+dist/
+build/
+*.egg-info/
 
 # Logs
 logs/
 
-# Fichiers Python compilés
+# Cache Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Jupyter checkpoints
+# Jupyter
 .ipynb_checkpoints/
 
-# Fichiers système
+# Système
 .DS_Store
-*.egg-info/
-dist/
-build/
-data/email_dataset.csv
-data/phishing_dataset.csv

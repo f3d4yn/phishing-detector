@@ -3,7 +3,13 @@
 Detecteur de phishing base sur le Machine Learning et la Programmation Orientee Objet en Python.
 Detecte les URLs et emails de phishing en temps reel depuis nimporte ou dans le terminal.
 
-## Installation rapide
+## Installation via PyPI (recommande)
+
+    pip install isphishing
+    isphishing-setup
+    isphishing
+
+## Installation via GitHub
 
 ### Linux / Mac
 
@@ -51,8 +57,8 @@ Entraine sur 93 916 echantillons (11 430 URLs + 82 486 Emails)
 
 ## Note sur les datasets
 
-Les datasets et le modele entraine ne sont pas inclus (trop lourds).
-Pour entrainer le modele :
+Les datasets ne sont pas inclus dans le depot.
+Pour reentrainer le modele :
 
 1. Telecharge les datasets sur Kaggle :
    - URLs  : Web Page Phishing Detection Dataset
@@ -69,3 +75,7 @@ Pour entrainer le modele :
 
 Habib Ilyas et Boukyod Abdessamad
 Module : Programmation Avancee (Python POO)
+
+## PyPI
+
+https://pypi.org/project/isphishing/

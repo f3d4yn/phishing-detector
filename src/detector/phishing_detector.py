@@ -114,3 +114,41 @@ class PhishingDetector:
 
     def load_model(self, model_path: str, vectorizer_path: str) -> None:
         self.model.load(model_path, vectorizer_path)
+
+def main_cli():
+    from config import MODEL_PATH, VECTORIZER_PATH
+    from src.inputs.email_input import EmailInput
+    from src.inputs.url_input import URLInput
+    import os, sys
+
+    # Change to package directory so paths work correctly
+    package_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    os.chdir(package_dir)
+    sys.path.insert(0, package_dir)
+
+    detector = PhishingDetector(
+        model_path=MODEL_PATH,
+        vectorizer_path=VECTORIZER_PATH
+    )
+
+    print("=" * 50)
+    print("      PHISHING DETECTOR - by f3d4yn")
+    print("=" * 50)
+    print("1. Analyze a URL")
+    print("2. Analyze an Email")
+    print("=" * 50)
+
+    choice = input("Enter your choice (1 or 2): ").strip()
+
+    if choice == "1":
+        url = input("Enter the URL to analyze: ").strip()
+        report = detector.analyze(URLInput(url))
+        print(report)
+    elif choice == "2":
+        sender = input("Enter sender email: ").strip()
+        subject = input("Enter email subject: ").strip()
+        body = input("Enter email body: ").strip()
+        report = detector.analyze(EmailInput(body, subject, sender))
+        print(report)
+    else:
+        print("Invalid choice.")

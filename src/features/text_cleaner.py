@@ -1,5 +1,20 @@
 import re
 import nltk
+
+# Auto-download NLTK data if not present
+def _ensure_nltk_data():
+    packages = ['stopwords', 'punkt', 'punkt_tab']
+    for package in packages:
+        try:
+            nltk.data.find(f'corpora/{package}')
+        except LookupError:
+            try:
+                nltk.data.find(f'tokenizers/{package}')
+            except LookupError:
+                nltk.download(package, quiet=True)
+
+_ensure_nltk_data()
+
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 
