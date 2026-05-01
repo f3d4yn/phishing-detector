@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "isphishing"
-version = "1.0.5"
+version = "1.0.6"
 authors = [
   { name="Habib Ilyas", email="ilyas.habib.23@ump.ac.ma" },
 ]

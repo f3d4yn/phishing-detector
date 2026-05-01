@@ -22,11 +22,11 @@ def display_header():
        by : Habib Ilyas & Boukyod Abdessamad    
 {ENDC}"""
     print(banner)
-    print(f"{RED}{'='*55}{ENDC}")
+    print(f"{BLUE}{'='*55}{ENDC}")
     print(f"{BOLD}Choose what to analyze:{ENDC}")
     print(f"  1.{ENDC} Analyze a URL")
     print(f"  2.{ENDC} Analyze an Email")
-    print(f"{RED}{'='*55}{ENDC}")
+    print(f"{BLUE}{'='*55}{ENDC}")
 
 def analyze_url(url: str):
     print(f"\n{BLUE}[*]{ENDC} Processing URL: {url}...")
@@ -51,7 +51,7 @@ def main():
         choice = input(f"{BOLD}Enter your choice (1 or 2): {ENDC}").strip()
         
         if choice == "1":
-            url = input(f"{BLUE}»{ENDC} Enter the URL to analyze: ").strip()
+            url = input(f"{YELLOW}»{ENDC} Enter the URL (ex: https://google.com): ").strip()
             if url:
                 analyze_url(url)
             else:

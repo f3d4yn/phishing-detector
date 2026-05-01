@@ -18,7 +18,7 @@ class PhishingDetector:
         self.url_threshold = 0.50
 
         # Threshold for emails
-        self.email_threshold = 0.85
+        self.email_threshold = 0.55
 
         self.alert = AlertSystem(threshold=self.url_threshold)
         if model_path and vectorizer_path:
@@ -59,9 +59,9 @@ class PhishingDetector:
             if features.get("has_ip"):
                 reasons.append("URL uses IP address instead of domain")
 
+            # Version "Alerte de Sécurité Systématique"
             if not features.get("is_https"):
-                reasons.append("URL does not use HTTPS")
-
+                reasons.append("SECURITY WARNING: This site does not use an encrypted connection (No HTTPS)")
             if features.get("url_length", 0) > 75:
                 reasons.append("URL is unusually long")
 
@@ -97,20 +97,23 @@ class PhishingDetector:
             if len(matched) >= 2:
                 reasons.append(f"Domain contains suspicious keywords: {', '.join(matched)}")
 
+
         # Email-specific checks
         if isinstance(input_data, EmailInput):
-            if features.get("suspicious_count", 0) > 3:
-                reasons.append("Text contains many suspicious words")
-            if features.get("has_url_in_text"):
-                reasons.append("Email contains embedded URLs")
-            if features.get("has_phone"):
-                reasons.append("Email contains a phone number")
+            # 1. Vérifier si des mots-clés d'urgence sont présents
+            urgent_keywords = ['urgent', 'suspension', 'supprimé', 'vérifier', 'sécurité']
+            content_lower = input_data.content.lower()
+            found_urgent = [word for word in urgent_keywords if word in content_lower]
+            if len(found_urgent) >= 2:
+                reasons.append(f"Email uses urgent language: {', '.join(found_urgent)}")
 
-        # Generic fallback
-        if not reasons and score > threshold:
-            reasons.append("ML model detected suspicious patterns")
+            # 2. Vérifier si l'expéditeur a une extension suspecte
+            if any(ext in input_data.sender for ext in ['.xyz', '.online', '.top']):
+                reasons.append("Sender address uses a suspicious domain extension")
 
-        return reasons
+            # 3. Vérifier si le score est élevé (même sans raisons techniques)
+            if score > 0.60:
+                reasons.append("ML model detected high-risk patterns in text")
 
     def load_model(self, model_path: str, vectorizer_path: str) -> None:
         self.model.load(model_path, vectorizer_path)
