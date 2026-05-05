@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "isphishing"
-version = "1.0.7"
+version = "2.0.0"
 authors = [
-  { name="Habib Ilyas", email="ilyas.habib.23@ump.ac.ma" },
+  { name="Habib Ilyas & Boukyod Abdessamad", email="ilyas.habib.23@ump.ac.ma" },
 ]
 description = "AI-powered phishing detector for URLs and emails"
 readme = "README.md"
@@ -19,6 +19,7 @@ dependencies = [
     "requests",
     "joblib",
     "numpy",
+    "xgboost",
 ]
 
 [project.scripts]
@@ -26,4 +27,4 @@ isphishing = "src.detector.phishing_cli:main_cli"
 isphishing-setup = "src.detector.phishing_setup:setup_cli"
 
 [project.urls]
-Homepage = "https://github.com/f3d4yn/phishing-detector"
+Homepage = "https://github.com/f3d4yn/isphishing"
