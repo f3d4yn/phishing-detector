@@ -5,11 +5,11 @@ import numpy as np
 
 sys.path.append(os.path.abspath('.'))
 
-from src.features.feature_extractor import FeatureExtractor
-from src.inputs.url_input import URLInput
-from src.inputs.email_input import EmailInput
-from src.model.ml_model import MLModel
-from src.model.evaluator import Evaluator
+from isphishing.features.feature_extractor import FeatureExtractor
+from isphishing.inputs.url_input import URLInput
+from isphishing.inputs.email_input import EmailInput
+from isphishing.model.ml_model import MLModel
+from isphishing.model.evaluator import Evaluator
 from sklearn.model_selection import train_test_split
 from config import (
     URL_MODEL_PATH, URL_VECTORIZER_PATH,

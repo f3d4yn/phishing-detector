@@ -7,7 +7,7 @@ from sklearn.metrics import (
     confusion_matrix,
     roc_auc_score
 )
-from src.model.ml_model import MLModel
+from isphishing.model.ml_model import MLModel
 
 class Evaluator:
 

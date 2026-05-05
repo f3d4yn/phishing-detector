@@ -1,5 +1,5 @@
 # Import the abstract base class we created
-from src.inputs.base_input import BaseInput
+from isphishing.inputs.base_input import BaseInput
 
 # tldextract is used to properly split a URL into its parts
 # Example: "http://paypal-secure.login-now.com" -> domain="login-now", suffix="com"

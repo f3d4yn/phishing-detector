@@ -1,24 +1,59 @@
 import re
 import pandas as pd
 import tldextract
-from src.inputs.base_input import BaseInput
-from src.inputs.email_input import EmailInput
-from src.inputs.url_input import URLInput
-from src.features.feature_extractor import FeatureExtractor
-from src.model.ml_model import MLModel
-from src.detector.threat_report import ThreatReport
-from src.alert.alert_system import AlertSystem
+from isphishing.inputs.base_input import BaseInput
+from isphishing.inputs.email_input import EmailInput
+from isphishing.inputs.url_input import URLInput
+from isphishing.features.feature_extractor import FeatureExtractor
+from isphishing.model.ml_model import MLModel
+from isphishing.detector.threat_report import ThreatReport
+from isphishing.alert.alert_system import AlertSystem
 
 TRUSTED_DOMAINS = [
-    "github.com", "google.com", "microsoft.com", "apple.com",
-    "amazon.com", "facebook.com", "twitter.com", "linkedin.com",
-    "stackoverflow.com", "wikipedia.org", "youtube.com",
-    "gitlab.com", "bitbucket.org"
+    "google.com", "bing.com", "yahoo.com", "duckduckgo.com", "baidu.com",
+    "facebook.com", "instagram.com", "twitter.com", "x.com", "linkedin.com",
+    "tiktok.com", "snapchat.com", "pinterest.com", "reddit.com", "tumblr.com",
+    "github.com", "gitlab.com", "bitbucket.org", "stackoverflow.com",
+    "docker.com", "npmjs.com", "pypi.org", "anaconda.com", "jupyter.org",
+    "microsoft.com", "office.com", "outlook.com", "live.com", "hotmail.com",
+    "azure.com", "onedrive.com", "sharepoint.com", "xbox.com",
+    "gmail.com", "youtube.com", "maps.google.com", "play.google.com", "cloud.google.com",
+    "apple.com", "icloud.com", "itunes.com",
+    "amazon.com", "amazon.fr", "amazon.co.uk", "aws.amazon.com", "aws.com",
+    "netflix.com", "spotify.com", "twitch.tv", "hulu.com", "disneyplus.com",
+    "primevideo.com", "soundcloud.com",
+    "claude.ai", "anthropic.com", "openai.com", "chatgpt.com",
+    "huggingface.co", "kaggle.com",
+    "paypal.com", "stripe.com", "visa.com", "mastercard.com",
+    "bbc.com", "cnn.com", "reuters.com", "nytimes.com", "theguardian.com",
+    "lemonde.fr", "lefigaro.fr",
+    "wikipedia.org", "coursera.org", "udemy.com", "edx.org", "khanacademy.org",
+    "mit.edu", "harvard.edu", "stanford.edu",
+    "cloudflare.com", "digitalocean.com", "heroku.com", "netlify.com",
+    "vercel.com",
+    "dropbox.com", "notion.so", "slack.com", "zoom.us", "discord.com",
+    "trello.com", "atlassian.com", "wordpress.com", "medium.com", "substack.com"
 ]
+
 TRUSTED_SENDERS = [
-    "github.com", "google.com", "microsoft.com", "apple.com",
-    "amazon.com", "facebook.com", "twitter.com", "linkedin.com",
-    "stackoverflow.com", "youtube.com", "gitlab.com"
+    "google.com", "bing.com", "yahoo.com",
+    "facebook.com", "instagram.com", "twitter.com", "x.com", "linkedin.com",
+    "tiktok.com", "pinterest.com", "reddit.com",
+    "github.com", "gitlab.com", "stackoverflow.com", "docker.com",
+    "npmjs.com", "pypi.org",
+    "microsoft.com", "outlook.com", "live.com", "hotmail.com",
+    "office.com", "azure.com",
+    "google.com", "gmail.com", "youtube.com",
+    "apple.com", "icloud.com",
+    "amazon.com", "amazon.fr", "amazon.co.uk", "aws.amazon.com",
+    "netflix.com", "spotify.com", "twitch.tv", "disneyplus.com",
+    "anthropic.com", "openai.com", "claude.ai",
+    "paypal.com", "stripe.com",
+    "bbc.com", "cnn.com", "nytimes.com",
+    "coursera.org", "udemy.com", "edx.org",
+    "cloudflare.com", "digitalocean.com", "heroku.com",
+    "dropbox.com", "notion.so", "slack.com", "zoom.us", "discord.com",
+    "wordpress.com", "medium.com"
 ]
 
 class PhishingDetector:
@@ -66,6 +101,17 @@ class PhishingDetector:
                 )
                 self.alert.send_alert(report)
                 return report
+        if isinstance(input_data, EmailInput):
+            threshold = self.email_threshold
+        else:
+            threshold = self.url_threshold
+
+        reasons = self._get_reasons(features, score, input_data, threshold)
+        report  = ThreatReport(score=score, reasons=reasons, threshold=threshold)
+        self.alert.threshold = threshold
+        self.alert.send_alert(report)
+
+        return report
 
     def _get_reasons(self, features: dict, score: float, input_data: BaseInput, threshold: float) -> list:
         reasons = []

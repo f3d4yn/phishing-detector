@@ -1,7 +1,7 @@
 import sys
-from src.detector.phishing_detector import PhishingDetector
-from src.inputs.email_input import EmailInput
-from src.inputs.url_input import URLInput
+from isphishing.detector.phishing_detector import PhishingDetector
+from isphishing.inputs.email_input import EmailInput
+from isphishing.inputs.url_input import URLInput
 from config import URL_MODEL_PATH, URL_VECTORIZER_PATH, EMAIL_MODEL_PATH, EMAIL_VECTORIZER_PATH
 
 # Couleurs pour le terminal Kali

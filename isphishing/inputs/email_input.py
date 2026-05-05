@@ -1,7 +1,7 @@
 from datetime import datetime
 
 # Import the abstract parent class
-from src.inputs.base_input import BaseInput
+from isphishing.inputs.base_input import BaseInput
 
 # EmailInput represents an email to be analyzed for phishing
 # It inherits content and timestamp from BaseInput

@@ -1,10 +1,10 @@
 import re
 import math
 from urllib.parse import urlparse
-from src.inputs.base_input import BaseInput
-from src.inputs.email_input import EmailInput
-from src.inputs.url_input import URLInput
-from src.features.text_cleaner import TextCleaner
+from isphishing.inputs.base_input import BaseInput
+from isphishing.inputs.email_input import EmailInput
+from isphishing.inputs.url_input import URLInput
+from isphishing.features.text_cleaner import TextCleaner
 import tldextract
 
 

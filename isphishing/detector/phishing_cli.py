@@ -62,9 +62,9 @@ def main_cli():
 
     sys.path.insert(0, os.getcwd())
 
-    from src.detector.phishing_detector import PhishingDetector
-    from src.inputs.email_input import EmailInput
-    from src.inputs.url_input import URLInput
+    from isphishing.detector.phishing_detector import PhishingDetector
+    from isphishing.inputs.email_input import EmailInput
+    from isphishing.inputs.url_input import URLInput
 
     if not MODEL_PATH:
         display_header()

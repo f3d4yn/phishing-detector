@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "isphishing"
-version = "2.0.0"
+version = "2.0.1"
 authors = [
   { name="Habib Ilyas & Boukyod Abdessamad", email="ilyas.habib.23@ump.ac.ma" },
 ]
@@ -28,3 +28,6 @@ isphishing-setup = "src.detector.phishing_setup:setup_cli"
 
 [project.urls]
 Homepage = "https://github.com/f3d4yn/isphishing"
+
+[tool.setuptools.package-data]
+"*" = ["models/*.pkl"]
