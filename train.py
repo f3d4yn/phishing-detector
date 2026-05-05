@@ -11,137 +11,149 @@ from src.inputs.email_input import EmailInput
 from src.model.ml_model import MLModel
 from src.model.evaluator import Evaluator
 from sklearn.model_selection import train_test_split
-from config import MODEL_PATH, VECTORIZER_PATH, TEST_SIZE, DATASET_PATH
+from config import (
+    URL_MODEL_PATH, URL_VECTORIZER_PATH,
+    EMAIL_MODEL_PATH, EMAIL_VECTORIZER_PATH,
+    MODELS_DIR,
+    TEST_SIZE
+)
 
 # ============================================================
-# STEP 1 : Load and prepare the URL dataset
+#   LOADING CONSOLIDATED DATASETS
 # ============================================================
-print("Loading URL dataset...")
-url_df = pd.read_csv(DATASET_PATH)
-print(f"URL dataset shape : {url_df.shape}")
-print(f"Label distribution : {url_df['status'].value_counts().to_dict()}")
+print("=" * 60)
+print("  LOADING CONSOLIDATED DATASETS")
+print("=" * 60)
+
+print("\n[1/2] Loading consolidated URL dataset...")
+all_urls = pd.read_csv("data/all_urls.csv").dropna()
+print(f"      {len(all_urls)} samples | {all_urls['label'].value_counts().to_dict()}")
+
+print("\n[2/2] Loading consolidated Email dataset...")
+all_emails = pd.read_csv("data/all_emails.csv").dropna()
+print(f"      {len(all_emails)} samples | {all_emails['label'].value_counts().to_dict()}")
 
 # ============================================================
-# STEP 2 : Load and prepare the Email dataset
+#   EXTRACTING URL FEATURES
 # ============================================================
-print("\nLoading Email dataset...")
-email_df = pd.read_csv("data/email_dataset.csv")
-print(f"Email dataset shape : {email_df.shape}")
-print(f"Label distribution : {email_df['label'].value_counts().to_dict()}")
+print("\n" + "=" * 60)
+print("  EXTRACTING URL FEATURES")
+print("=" * 60)
 
-# ============================================================
-# STEP 3 : Extract features from URL dataset
-# ============================================================
-print("\nExtracting features from URL dataset...")
 url_features_list = []
-
-for index, row in url_df.iterrows():
+for index, row in all_urls.iterrows():
     try:
-        url_input = URLInput(row['url'])
+        url_input = URLInput(str(row['url']))
         extractor = FeatureExtractor(url_input)
-        features = extractor.extract()
-        features['label'] = 1 if row['status'] == 'phishing' else 0
+        features  = extractor.extract()
+        features['label'] = int(row['label'])
         url_features_list.append(features)
-
-        if index % 1000 == 0:
-            print(f"  Processed {index} / {len(url_df)} URLs...")
-
-    except Exception as e:
+        if index % 10000 == 0:
+            print(f"  Processed {index} / {len(all_urls)} URLs...")
+    except Exception:
         continue
 
 print(f"URL features extracted : {len(url_features_list)}")
 
 # ============================================================
-# STEP 4 : Extract features from Email dataset
+#   EXTRACTING EMAIL FEATURES
 # ============================================================
-print("\nExtracting features from Email dataset...")
-email_features_list = []
+print("\n" + "=" * 60)
+print("  EXTRACTING EMAIL FEATURES")
+print("=" * 60)
 
-for index, row in email_df.iterrows():
+email_features_list = []
+for index, row in all_emails.iterrows():
     try:
-        # Create a fake sender so EmailInput is valid
         email_input = EmailInput(
-            raw_text=str(row['text_combined']),
+            raw_text=str(row['text']),
             subject="",
             sender="sender@domain.com"
         )
         extractor = FeatureExtractor(email_input)
-        features = extractor.extract()
+        features  = extractor.extract()
         features['label'] = int(row['label'])
         email_features_list.append(features)
-
-        if index % 1000 == 0:
-            print(f"  Processed {index} / {len(email_df)} emails...")
-
-    except Exception as e:
+        if index % 10000 == 0:
+            print(f"  Processed {index} / {len(all_emails)} emails...")
+    except Exception:
         continue
 
 print(f"Email features extracted : {len(email_features_list)}")
 
 # ============================================================
-# STEP 5 : Combine both datasets
+#   PREPARING DATA — SÉPARÉ PAR TYPE
 # ============================================================
-print("\nCombining datasets...")
+print("\n" + "=" * 60)
+print("  PREPARING DATA")
+print("=" * 60)
 
-url_features_df = pd.DataFrame(url_features_list)
-email_features_df = pd.DataFrame(email_features_list)
+url_df   = pd.DataFrame(url_features_list).fillna(0)
+email_df = pd.DataFrame(email_features_list).fillna(0)
 
-# Combine URL and email features into one DataFrame
-combined_df = pd.concat([url_features_df, email_features_df], ignore_index=True)
+print(f"\nURL dataset shape   : {url_df.shape}")
+print(f"Email dataset shape : {email_df.shape}")
 
-# Fill any missing values with 0
-combined_df = combined_df.fillna(0)
+X_url   = url_df.drop(columns=['label'])
+y_url   = url_df['label']
 
-print(f"Combined dataset shape : {combined_df.shape}")
-print(f"Label distribution : {combined_df['label'].value_counts().to_dict()}")
-
-# ============================================================
-# STEP 6 : Prepare X and y
-# ============================================================
-print("\nPreparing data...")
-
-X = combined_df.drop(columns=['label'])
-y = combined_df['label']
+X_email = email_df.drop(columns=['label'])
+y_email = email_df['label']
 
 # ============================================================
-# STEP 7 : Split into train and test sets
+#   SPLITTING
 # ============================================================
-print("\nSplitting dataset...")
+print("\n" + "=" * 60)
+print("  SPLITTING DATASETS")
+print("=" * 60)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y,
-    test_size=TEST_SIZE,
-    random_state=42,
-    stratify=y
+X_url_train, X_url_test, y_url_train, y_url_test = train_test_split(
+    X_url, y_url, test_size=TEST_SIZE, random_state=42, stratify=y_url
 )
 
-print(f"Training set : {X_train.shape[0]} samples")
-print(f"Testing set  : {X_test.shape[0]} samples")
+X_email_train, X_email_test, y_email_train, y_email_test = train_test_split(
+    X_email, y_email, test_size=TEST_SIZE, random_state=42, stratify=y_email
+)
 
 # ============================================================
-# STEP 8 : Train the model
+#   TRAINING — MODÈLE URL
 # ============================================================
-print("\nTraining the model...")
+print("\n" + "=" * 60)
+print("  TRAINING URL MODEL")
+print("=" * 60)
 
-model = MLModel()
-model.train(X_train, y_train)
+url_model = MLModel()
+url_model.train(X_url_train, y_url_train)
 
-# ============================================================
-# STEP 9 : Evaluate the model
-# ============================================================
-print("\nEvaluating the model...")
-
-evaluator = Evaluator(model)
-evaluator.evaluate(X_test, y_test)
-evaluator.print_report()
-evaluator.confusion_matrix(X_test, y_test)
+print("\n--- URL Model Evaluation ---")
+url_evaluator = Evaluator(url_model)
+url_evaluator.evaluate(X_url_test, y_url_test)
+url_evaluator.print_report()
 
 # ============================================================
-# STEP 10 : Save the model
+#   TRAINING — MODÈLE EMAIL
 # ============================================================
-print("\nSaving the model...")
+print("\n" + "=" * 60)
+print("  TRAINING EMAIL MODEL")
+print("=" * 60)
 
-os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
-model.save(MODEL_PATH, VECTORIZER_PATH)
+email_model = MLModel()
+email_model.train(X_email_train, y_email_train)
 
-print("\nRetraining complete! You can now run main.py to analyze URLs and Emails.")
+print("\n--- Email Model Evaluation ---")
+email_evaluator = Evaluator(email_model)
+email_evaluator.evaluate(X_email_test, y_email_test)
+email_evaluator.print_report()
+
+# ============================================================
+#   SAVING MODELS
+# ============================================================
+os.makedirs(MODELS_DIR, exist_ok=True)
+
+# URL model
+url_model.save(URL_MODEL_PATH, URL_VECTORIZER_PATH)
+
+# Email model
+email_model.save(EMAIL_MODEL_PATH, EMAIL_VECTORIZER_PATH)
+
+print("\nRetraining complete with 2 separate models!")

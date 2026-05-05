@@ -2,7 +2,6 @@ import os
 import sys
 import nltk
 
-# Color codes
 BLUE = '\033[94m'
 RED = '\033[91m'
 GREEN = '\033[92m'
@@ -38,20 +37,36 @@ def display_header():
     print(f"  2. Analyze an Email")
     print(f"{RED}{'='*55}{ENDC}")
 
+def get_model_path():
+    # Look for model in ~/.isphishing/models/ first (PyPI install)
+    home_models = os.path.join(os.path.expanduser("~"), ".isphishing", "models")
+    model_path = os.path.join(home_models, "model.pkl")
+    vectorizer_path = os.path.join(home_models, "vectorizer.pkl")
+
+    if os.path.exists(model_path):
+        return model_path, vectorizer_path
+
+    # Fallback: look in current directory (GitHub install)
+    local_model = os.path.join(os.getcwd(), "models", "model.pkl")
+    local_vectorizer = os.path.join(os.getcwd(), "models", "vectorizer.pkl")
+
+    if os.path.exists(local_model):
+        return local_model, local_vectorizer
+
+    return None, None
+
 def main_cli():
     download_nltk_data()
 
-    user_dir = os.getcwd()
-    MODEL_PATH = os.path.join(user_dir, "models", "model.pkl")
-    VECTORIZER_PATH = os.path.join(user_dir, "models", "vectorizer.pkl")
+    MODEL_PATH, VECTORIZER_PATH = get_model_path()
 
-    sys.path.insert(0, user_dir)
+    sys.path.insert(0, os.getcwd())
 
     from src.detector.phishing_detector import PhishingDetector
     from src.inputs.email_input import EmailInput
     from src.inputs.url_input import URLInput
 
-    if not os.path.exists(MODEL_PATH):
+    if not MODEL_PATH:
         display_header()
         print(f"{RED}  Model not found!{ENDC}")
         print(f"  Please run: {BOLD}isphishing-setup{ENDC}")
@@ -69,7 +84,7 @@ def main_cli():
     choice = input("Enter your choice (1 or 2): ").strip()
 
     if choice == "1":
-        url = input(f"» Enter the URL to analyze: ").strip()
+        url = input("» Enter the URL to analyze: ").strip()
         print(f"{YELLOW}[*] Processing URL: {url}...{ENDC}")
         try:
             report = detector.analyze(URLInput(url))
@@ -79,9 +94,9 @@ def main_cli():
             print(f"{RED}[!] An error occurred: {e}{ENDC}")
 
     elif choice == "2":
-        sender = input(f"» Enter sender email: ").strip()
-        subject = input(f"» Enter email subject: ").strip()
-        body = input(f"» Enter email body: ").strip()
+        sender = input("» Enter sender email: ").strip()
+        subject = input("» Enter email subject: ").strip()
+        body = input("» Enter email body: ").strip()
         print(f"{YELLOW}[*] Processing Email from: {sender}...{ENDC}")
         try:
             report = detector.analyze(EmailInput(body, subject, sender))
